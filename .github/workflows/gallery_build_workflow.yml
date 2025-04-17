@@ -1,0 +1,38 @@
+name: Build and Deploy Gallery
+
+on:
+  push:
+    paths:
+      - 'gallery.json'
+      - 'index.html'
+      - 'assets/**'
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies (if needed)
+        run: |
+          if [ -f package.json ]; then npm install; fi
+
+      - name: Build static gallery (basic example)
+        run: |
+          mkdir -p dist
+          cp index.html dist/index.html
+          cp gallery.json dist/gallery.json
+          cp -r assets dist/assets
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
